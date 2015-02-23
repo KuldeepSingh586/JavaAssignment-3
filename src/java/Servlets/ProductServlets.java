@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package Servlets;
 
 import DataBaseConnection.Credentials;
@@ -68,7 +67,7 @@ public class ProductServlets extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          Set<String> keyValues = request.getParameterMap().keySet();
+        Set<String> keyValues = request.getParameterMap().keySet();
 
         try {
             PrintWriter output = response.getWriter();
@@ -86,7 +85,31 @@ public class ProductServlets extends HttpServlet {
         } catch (IOException ex) {
             System.err.println("Input Output Issue: " + ex.getMessage());
         }
-      
+
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+        int changes = 0;
+        Set<String> keySet = request.getParameterMap().keySet();
+        try (PrintWriter out = response.getWriter()) {
+            if (keySet.contains("ProductID") && keySet.contains("name") && keySet.contains("description") && keySet.contains("quantity")) {
+                String ProductID = request.getParameter("ProductID");
+                String name = request.getParameter("name");
+                String description = request.getParameter("description");
+                String quantity = request.getParameter("quantity");
+                resultMethod("update product set ProductID = ?, name = ?, description = ?, quantity = ? where ProductID = ?", ProductID, name, description, quantity, ProductID);
+                if (changes > 0) {
+                    response.sendRedirect("http://localhost:8080/CPD4414-Assignment3/products?id=" + ProductID);
+                } else {
+                    response.setStatus(500);
+                }
+            } else {
+                out.println("Error: Not data found for this input. Please use a URL of the form /products?id=xx&name=XXX&description=XXX&quantity=xx");
+            }
+        } catch (IOException ex) {
+            System.out.println("Error in writing output: " + ex.getMessage());
+        }
     }
 
     /**
@@ -99,7 +122,7 @@ public class ProductServlets extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-     private String resultMethod(String query, String... params) {
+    private String resultMethod(String query, String... params) {
         StringBuilder sb = new StringBuilder();
         try (Connection conn = Credentials.getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement(query);
