@@ -185,7 +185,7 @@ public class ProductServlets extends HttpServlet {
                 sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ProductServlets.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("SQL Exception Error: " + ex.getMessage());
         }
         return sb.toString();
     }
