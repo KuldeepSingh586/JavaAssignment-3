@@ -114,7 +114,25 @@ public class ProductServlets extends HttpServlet {
     }
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-       
+        Set<String> keySet = request.getParameterMap().keySet();
+        try (PrintWriter out = response.getWriter()) {
+            Connection conn = getConnection();
+            if (keySet.contains("productID")) {
+                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM TABLE`product` WHERE `ProductID`=" + request.getParameter("productID"));
+                try {
+                    pstmt.executeUpdate();
+                } catch (SQLException ex) {
+                    Logger.getLogger(ProductServlets.class.getName()).log(Level.SEVERE, null, ex);
+                    out.println("Error in deleting entry.");
+                    response.setStatus(500);
+                }
+            } else {
+                out.println("Error: Not enough data in table to delete");
+                response.setStatus(500);
+            }
+        } catch (SQLException ex) {
+            System.err.println("SQL Exception Error: "+ex.getMessage());
+        }
     }
 
     /**
