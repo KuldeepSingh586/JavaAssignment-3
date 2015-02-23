@@ -6,6 +6,7 @@
 package Servlets;
 
 import DataBaseConnection.Credentials;
+import static DataBaseConnection.Credentials.getConnection;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -110,6 +111,10 @@ public class ProductServlets extends HttpServlet {
         } catch (IOException ex) {
             System.out.println("Error in writing output: " + ex.getMessage());
         }
+    }
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+       
     }
 
     /**
