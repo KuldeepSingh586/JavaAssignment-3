@@ -164,7 +164,14 @@ public class ProductServlets extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+   /**
+    * resultMethod took two arguments 
+    * This method executes the query
+    * @param query
+    * @param params
+    *  @throws SQLException
+    * @return String
+    */
     private String resultMethod(String query, String... params) {
         StringBuilder sb = new StringBuilder();
         try (Connection conn = Credentials.getConnection()) {
@@ -177,7 +184,7 @@ public class ProductServlets extends HttpServlet {
                 sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ProductServlets.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("SQL Exception Error: " + ex.getMessage());
         }
         return sb.toString();
     }
