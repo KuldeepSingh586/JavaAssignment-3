@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class Credentials {
 
     /**
-     * Provides a Connection to the Xampp c0648442 DB
+     * Provides a Connection to the Xampp "c0648442" DataBase
      * Created connection in getConnection Method
      * Created product Table in dataBase
      * @return - the connection object or null if a connection failed
