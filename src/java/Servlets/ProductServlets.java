@@ -31,7 +31,8 @@ public class ProductServlets extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP <code>GET</code> method. doGet Method took two arguments
+     * It will select data from product table Also Handle Exception
      *
      * @param request servlet request
      * @param response servlet response
@@ -58,7 +59,8 @@ public class ProductServlets extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Handles the HTTP <code>POST</code> method.doGet Method took two arguments
+     * It will insert data from product table Also Handle Exception
      *
      * @param request servlet request
      * @param response servlet response
@@ -89,6 +91,7 @@ public class ProductServlets extends HttpServlet {
 
     }
 
+    
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
         int changes = 0;
@@ -112,6 +115,8 @@ public class ProductServlets extends HttpServlet {
             System.out.println("Error in writing output: " + ex.getMessage());
         }
     }
+
+   
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Set<String> keySet = request.getParameterMap().keySet();
@@ -122,7 +127,7 @@ public class ProductServlets extends HttpServlet {
                 try {
                     pstmt.executeUpdate();
                 } catch (SQLException ex) {
-                    Logger.getLogger(ProductServlets.class.getName()).log(Level.SEVERE, null, ex);
+                    System.err.println("SQL Exception Error in Update prepared Statement: " + ex.getMessage());
                     out.println("Error in deleting entry.");
                     response.setStatus(500);
                 }
@@ -131,7 +136,7 @@ public class ProductServlets extends HttpServlet {
                 response.setStatus(500);
             }
         } catch (SQLException ex) {
-            System.err.println("SQL Exception Error: "+ex.getMessage());
+            System.err.println("SQL Exception Error: " + ex.getMessage());
         }
     }
 
