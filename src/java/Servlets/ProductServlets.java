@@ -123,7 +123,15 @@ public class ProductServlets extends HttpServlet {
         }
     }
 
-   
+    /**
+     * doDelete Method took two Arguments and This method Will delete Entries
+     * from product Table This will also catch SQLException and Display an error
+     * message
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Set<String> keySet = request.getParameterMap().keySet();
