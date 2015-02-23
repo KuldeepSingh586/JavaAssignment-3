@@ -6,8 +6,15 @@
 
 package Servlets;
 
+import DataBaseConnection.Credentials;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,32 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "ProductServlets", urlPatterns = {"/ProductServlets"})
 public class ProductServlets extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ProductServlets</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ProductServlets at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -59,7 +40,20 @@ public class ProductServlets extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.setHeader("Content-Type", "text/plain-text");
+        try {
+            PrintWriter output = response.getWriter();
+            String query = "SELECT * FROM product;";
+            if (!request.getParameterNames().hasMoreElements()) {
+                output.println(resultMethod(query));
+            } else {
+                int id = Integer.parseInt(request.getParameter("ProductID"));
+                output.println(resultMethod("SELECT * FROM product WHERE ProductID= ?", String.valueOf(id)));
+            }
+
+        } catch (IOException ex) {
+            System.err.println("Input output Exception: " + ex.getMessage());
+        }
     }
 
     /**
@@ -73,7 +67,7 @@ public class ProductServlets extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+      
     }
 
     /**
@@ -85,5 +79,22 @@ public class ProductServlets extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+     private String resultMethod(String query, String... params) {
+        StringBuilder sb = new StringBuilder();
+        try (Connection conn = Credentials.getConnection()) {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            for (int i = 1; i <= params.length; i++) {
+                pstmt.setString(i, params[i - 1]);
+            }
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductServlets.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return sb.toString();
+    }
 
 }
