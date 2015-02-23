@@ -164,7 +164,15 @@ public class ProductServlets extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    /**
+     * resultMethod accepts two arguments
+     * It executes the Query
+     * get ProductID, name, description, quantity
+     * @param query
+     * @param params
+     * @throws SQLException
+     * @return 
+     */
     private String resultMethod(String query, String... params) {
         StringBuilder sb = new StringBuilder();
         try (Connection conn = Credentials.getConnection()) {
