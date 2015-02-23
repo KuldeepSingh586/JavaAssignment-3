@@ -31,7 +31,7 @@ public class Credentials {
 
         }
             catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(Credentials.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("No class found Exception"+ex.getMessage());
         }
         return conn; 
     }
