@@ -91,7 +91,14 @@ public class ProductServlets extends HttpServlet {
 
     }
 
-    
+    /**
+     * doPut Method took two Arguments and This method Will update Entries in
+     * product Table. This will also catch SQLException and Display an error
+     * message.
+     *
+     * @param request
+     * @param response
+     */
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
         int changes = 0;
