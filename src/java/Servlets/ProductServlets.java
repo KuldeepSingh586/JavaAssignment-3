@@ -191,8 +191,6 @@ public class ProductServlets extends HttpServlet {
             ResultSet rs = pstmt.executeQuery();
             List l1 = new LinkedList();
             while (rs.next()) {
-
-                //sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
                 Map m1 = new LinkedHashMap();
                 m1.put("ProductID", rs.getInt("ProductID"));
                 m1.put("name", rs.getString("name"));
@@ -200,7 +198,7 @@ public class ProductServlets extends HttpServlet {
                 m1.put("quantity", rs.getInt("quantity"));
                 l1.add(m1);
             }
-            
+
             jsonString = JSONValue.toJSONString(l1);
         } catch (SQLException ex) {
             System.err.println("SQL Exception Error: " + ex.getMessage());
