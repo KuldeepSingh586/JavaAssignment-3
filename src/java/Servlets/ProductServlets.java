@@ -116,10 +116,10 @@ public class ProductServlets extends HttpServlet {
                 String quantity = request.getParameter("quantity");
                 doUpdate("update product set ProductID = ?, name = ?, description = ?, quantity = ? where ProductID = ?", ProductID, name, description, quantity, ProductID);
             } else {
-                response.setStatus(500);
                 out.println("Error: Not data found for this input. Please use a URL of the form /products?id=xx&name=XXX&description=XXX&quantity=xx");
             }
         } catch (IOException ex) {
+            response.setStatus(500);
             System.out.println("Error in writing output: " + ex.getMessage());
         }
     }
