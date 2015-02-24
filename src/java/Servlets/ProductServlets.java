@@ -14,6 +14,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +27,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 /**
  *
@@ -72,23 +80,23 @@ public class ProductServlets extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Set<String> keyValues = request.getParameterMap().keySet();
-
+        
         try {
             PrintWriter output = response.getWriter();
-            if (keyValues.contains("ProductID") && keyValues.contains("name") && keyValues.contains("description") 
-                   && keyValues.contains("quantity")) {
+            if (keyValues.contains("ProductID") && keyValues.contains("name") && keyValues.contains("description")
+                    && keyValues.contains("quantity")) {
                 String ProductID = request.getParameter("ProductID");
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
                 String quantity = request.getParameter("quantity");
-                resultMethod("INSERT INTO product (ProductID,name,description,quantity) VALUES (?, ?, ?, ?)", ProductID, name, description, quantity);
+                doUpdate("INSERT INTO product (ProductID,name,description,quantity) VALUES (?, ?, ?, ?)", ProductID, name, description, quantity);
 
             } else {
                 output.println("Error: Not data found for this input. Please use a URL of the form /servlet?name=XYZ&age=XYZ");
             }
 
         } catch (IOException ex) {
-            System.err.println("Input Output Issue: " + ex.getMessage());
+            System.err.println("Input Output Issue in doPost Method: " + ex.getMessage());
         }
 
     }
@@ -103,7 +111,7 @@ public class ProductServlets extends HttpServlet {
      */
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-        
+
         Set<String> keySet = request.getParameterMap().keySet();
         try (PrintWriter out = response.getWriter()) {
             if (keySet.contains("ProductID") && keySet.contains("name") && keySet.contains("description") && keySet.contains("quantity")) {
@@ -135,7 +143,7 @@ public class ProductServlets extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Connection conn = getConnection();
             if (keySet.contains("ProductID")) {
-                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM `product` WHERE `ProductID`="+ request.getParameter("ProductID"));
+                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM `product` WHERE `ProductID`=" + request.getParameter("ProductID"));
                 try {
                     pstmt.executeUpdate();
                 } catch (SQLException ex) {
@@ -161,17 +169,19 @@ public class ProductServlets extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
     /**
-     * resultMethod accepts two arguments
-     * It executes the Query
-     * get ProductID, name, description, quantity
+     * resultMethod accepts two arguments It executes the Query get ProductID,
+     * name, description, quantity
+     *
      * @param query
      * @param params
      * @throws SQLException
-     * @return 
+     * @return
      */
     private String resultMethod(String query, String... params) {
         StringBuilder sb = new StringBuilder();
+        String jsonString="";
         try (Connection conn = Credentials.getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement(query);
             for (int i = 1; i <= params.length; i++) {
@@ -179,22 +189,43 @@ public class ProductServlets extends HttpServlet {
             }
 //            out.println(pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
+            JSONObject obj = new JSONObject();
+            JSONArray list1 = new JSONArray();
+             
             while (rs.next()) {
+
                 sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
+                
+//                Map m1 = new LinkedHashMap();
+//                Map m2 = new HashMap();
+//                List l1 = new LinkedList();
+//
+//                m1.put("ProductID", rs.getInt("ProductID"));
+//                m1.put("name", rs.getString("name"));
+//                m1.put("description", rs.getString("description"));
+//                m1.put("quantity", rs.getInt("quantity"));
+//                l1.add(m1);
+//                
+//               jsonString =l1.toString();
+               
             }
+            
+            
         } catch (SQLException ex) {
             System.err.println("SQL Exception Error: " + ex.getMessage());
         }
         return sb.toString();
     }
+
     /**
-     * doUpdate Method accepts two arguments
-     * Update the entries in the table 'product'
+     * doUpdate Method accepts two arguments Update the entries in the table
+     * 'product'
+     *
      * @param query
      * @param params
-     * @return 
+     * @return
      */
-     private int doUpdate(String query, String... params) {
+    private int doUpdate(String query, String... params) {
         int numChanges = 0;
         try (Connection conn = Credentials.getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -203,7 +234,7 @@ public class ProductServlets extends HttpServlet {
             }
             numChanges = pstmt.executeUpdate();
         } catch (SQLException ex) {
-            System.err.println("SQL EXception in doUpdate Method"+ex.getMessage());
+            System.err.println("SQL EXception in doUpdate Method" + ex.getMessage());
         }
         return numChanges;
     }
