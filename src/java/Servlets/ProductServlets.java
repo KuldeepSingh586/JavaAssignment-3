@@ -187,7 +187,13 @@ public class ProductServlets extends HttpServlet {
         }
         return sb.toString();
     }
-    
+    /**
+     * doUpdate Method accepts two arguments
+     * Update the entries in the table 'product'
+     * @param query
+     * @param params
+     * @return 
+     */
      private int doUpdate(String query, String... params) {
         int numChanges = 0;
         try (Connection conn = Credentials.getConnection()) {
