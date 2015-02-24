@@ -9,33 +9,27 @@ import DataBaseConnection.Credentials;
 import static DataBaseConnection.Credentials.getConnection;
 import java.io.IOException;
 import java.io.PrintWriter;
-import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 /**
  *
  * @author Kuldeep
  */
-@WebServlet("/product")
+@WebServlet("/products")
 public class ProductServlets extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -92,6 +86,7 @@ public class ProductServlets extends HttpServlet {
                 doUpdate("INSERT INTO product (ProductID,name,description,quantity) VALUES (?, ?, ?, ?)", ProductID, name, description, quantity);
 
             } else {
+                response.setStatus(500);
                 output.println("Error: Not data found for this input. Please use a URL of the form /servlet?name=XYZ&age=XYZ");
             }
 
@@ -121,6 +116,7 @@ public class ProductServlets extends HttpServlet {
                 String quantity = request.getParameter("quantity");
                 doUpdate("update product set ProductID = ?, name = ?, description = ?, quantity = ? where ProductID = ?", ProductID, name, description, quantity, ProductID);
             } else {
+                response.setStatus(500);
                 out.println("Error: Not data found for this input. Please use a URL of the form /products?id=xx&name=XXX&description=XXX&quantity=xx");
             }
         } catch (IOException ex) {
@@ -149,11 +145,11 @@ public class ProductServlets extends HttpServlet {
                 } catch (SQLException ex) {
                     System.err.println("SQL Exception Error in Update prepared Statement: " + ex.getMessage());
                     out.println("Error in deleting entry.");
-                    response.setStatus(500);
+                   
                 }
             } else {
                 out.println("Error: Not enough data in table to delete");
-                response.setStatus(500);
+                
             }
         } catch (SQLException ex) {
             System.err.println("SQL Exception Error: " + ex.getMessage());
