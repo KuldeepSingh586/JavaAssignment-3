@@ -9,6 +9,7 @@ import DataBaseConnection.Credentials;
 import static DataBaseConnection.Credentials.getConnection;
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Kuldeep
  */
-@WebServlet(name = "ProductServlets", urlPatterns = {"/ProductServlets"})
+@WebServlet("/product")
 public class ProductServlets extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -74,7 +75,8 @@ public class ProductServlets extends HttpServlet {
 
         try {
             PrintWriter output = response.getWriter();
-            if (keyValues.contains("ProductID") && keyValues.contains("name") && keyValues.contains("description") && keyValues.contains("quantity")) {
+            if (keyValues.contains("ProductID") && keyValues.contains("name") && keyValues.contains("description") 
+                   && keyValues.contains("quantity")) {
                 String ProductID = request.getParameter("ProductID");
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
@@ -101,7 +103,7 @@ public class ProductServlets extends HttpServlet {
      */
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-        int changes = 0;
+        
         Set<String> keySet = request.getParameterMap().keySet();
         try (PrintWriter out = response.getWriter()) {
             if (keySet.contains("ProductID") && keySet.contains("name") && keySet.contains("description") && keySet.contains("quantity")) {
@@ -109,12 +111,7 @@ public class ProductServlets extends HttpServlet {
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
                 String quantity = request.getParameter("quantity");
-                resultMethod("update product set ProductID = ?, name = ?, description = ?, quantity = ? where ProductID = ?", ProductID, name, description, quantity, ProductID);
-                if (changes > 0) {
-                    response.sendRedirect("http://localhost:8080/CPD4414-Assignment3/products?id=" + ProductID);
-                } else {
-                    response.setStatus(500);
-                }
+                doUpdate("update product set ProductID = ?, name = ?, description = ?, quantity = ? where ProductID = ?", ProductID, name, description, quantity, ProductID);
             } else {
                 out.println("Error: Not data found for this input. Please use a URL of the form /products?id=xx&name=XXX&description=XXX&quantity=xx");
             }
@@ -137,8 +134,8 @@ public class ProductServlets extends HttpServlet {
         Set<String> keySet = request.getParameterMap().keySet();
         try (PrintWriter out = response.getWriter()) {
             Connection conn = getConnection();
-            if (keySet.contains("productID")) {
-                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM TABLE`product` WHERE `ProductID`=" + request.getParameter("productID"));
+            if (keySet.contains("ProductID")) {
+                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM `product` WHERE `ProductID`="+ request.getParameter("ProductID"));
                 try {
                     pstmt.executeUpdate();
                 } catch (SQLException ex) {
@@ -180,6 +177,7 @@ public class ProductServlets extends HttpServlet {
             for (int i = 1; i <= params.length; i++) {
                 pstmt.setString(i, params[i - 1]);
             }
+//            out.println(pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
@@ -188,6 +186,20 @@ public class ProductServlets extends HttpServlet {
             System.err.println("SQL Exception Error: " + ex.getMessage());
         }
         return sb.toString();
+    }
+    
+     private int doUpdate(String query, String... params) {
+        int numChanges = 0;
+        try (Connection conn = Credentials.getConnection()) {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            for (int i = 1; i <= params.length; i++) {
+                pstmt.setString(i, params[i - 1]);
+            }
+            numChanges = pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("SQL EXception in doUpdate Method"+ex.getMessage());
+        }
+        return numChanges;
     }
 
 }
