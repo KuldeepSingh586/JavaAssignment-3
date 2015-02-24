@@ -80,7 +80,7 @@ public class ProductServlets extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Set<String> keyValues = request.getParameterMap().keySet();
-        
+
         try {
             PrintWriter output = response.getWriter();
             if (keyValues.contains("ProductID") && keyValues.contains("name") && keyValues.contains("description")
@@ -181,7 +181,7 @@ public class ProductServlets extends HttpServlet {
      */
     private String resultMethod(String query, String... params) {
         StringBuilder sb = new StringBuilder();
-        String jsonString="";
+        String jsonString = "";
         try (Connection conn = Credentials.getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement(query);
             for (int i = 1; i <= params.length; i++) {
@@ -189,32 +189,23 @@ public class ProductServlets extends HttpServlet {
             }
 //            out.println(pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
-            JSONObject obj = new JSONObject();
-            JSONArray list1 = new JSONArray();
-             
+            List l1 = new LinkedList();
             while (rs.next()) {
 
-                sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
-                
-//                Map m1 = new LinkedHashMap();
-//                Map m2 = new HashMap();
-//                List l1 = new LinkedList();
-//
-//                m1.put("ProductID", rs.getInt("ProductID"));
-//                m1.put("name", rs.getString("name"));
-//                m1.put("description", rs.getString("description"));
-//                m1.put("quantity", rs.getInt("quantity"));
-//                l1.add(m1);
-//                
-//               jsonString =l1.toString();
-               
+                //sb.append(String.format("%s\t%s\t%s\t%s\n", rs.getInt("ProductID"), rs.getString("name"), rs.getString("description"), rs.getInt("quantity")));
+                Map m1 = new LinkedHashMap();
+                m1.put("ProductID", rs.getInt("ProductID"));
+                m1.put("name", rs.getString("name"));
+                m1.put("description", rs.getString("description"));
+                m1.put("quantity", rs.getInt("quantity"));
+                l1.add(m1);
             }
             
-            
+            jsonString = JSONValue.toJSONString(l1);
         } catch (SQLException ex) {
             System.err.println("SQL Exception Error: " + ex.getMessage());
         }
-        return sb.toString();
+        return jsonString;
     }
 
     /**
@@ -223,7 +214,7 @@ public class ProductServlets extends HttpServlet {
      *
      * @param query
      * @param params
-     * @return
+     * @return numChanges
      */
     private int doUpdate(String query, String... params) {
         int numChanges = 0;
